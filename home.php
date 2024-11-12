@@ -1,49 +1,57 @@
 <?php
 session_start();
-include 'database.php'; // Include the database connection
 
-// Ensure user is logged in
+// Check if the user is logged in
 if (!isset($_SESSION['username'])) {
-    header("Location: login.html");
+    header("Location: login.php");
     exit();
 }
 
 $username = $_SESSION['username'];
-
-// Retrieve user's latest posts or group posts
-$query = "SELECT * FROM posts WHERE author_id = (SELECT id FROM members WHERE username = ?) ORDER BY created_at DESC LIMIT 10";
-$stmt = $conn->prepare($query);
-$stmt->bind_param("s", $username);
-$stmt->execute();
-$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <title>Home - COSN</title>
     <link rel="stylesheet" href="styles/styles.css">
 </head>
-
 <body>
-    <h2>Welcome, <?php echo htmlspecialchars($username); ?></h2>
-    <h3>Your Latest Posts</h3>
-    <div class="posts">
-        <?php while ($post = $result->fetch_assoc()): ?>
-            <div class="post">
-                <h4><?php echo htmlspecialchars($post['title']); ?></h4>
-                <p><?php echo htmlspecialchars($post['content']); ?></p>
-                <span>Posted on: <?php echo $post['created_at']; ?></span>
+    <div class="navbar">
+        <h2>COSN - Welcome, <?php echo htmlspecialchars($username); ?>!</h2>
+        <a href="logout.php" class="button logout">Logout</a>
+    </div>
+
+    <div class="container">
+        <div class="section">
+            <h3>Actions</h3>
+            <div class="button-container">
+                <a href="message.php" class="button">Messages</a>
+                <a href="groups.php" class="button">Groups</a>
+                <a href="events.php" class="button">Events</a>
+                <a href="friends.php" class="button">Friends</a>
+                <a href="settings.php" class="button">Account Settings</a>
             </div>
-        <?php endwhile; ?>
+        </div>
+
+        <div class="section">
+            <h3>Your Latest Posts</h3>
+            <!-- Code to display the latest posts by the user -->
+            <div class="posts">
+                <p>No recent posts yet. Start connecting with your friends and groups!</p>
+                <!-- Loop to display user posts -->
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>Notifications</h3>
+            <!-- Notifications area -->
+            <div class="notifications">
+                <p>No new notifications.</p>
+                <!-- Notification loop -->
+            </div>
+        </div>
     </div>
 </body>
-
 </html>
-
-<?php
-// Close the connection
-$conn->close();
-?>

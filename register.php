@@ -1,8 +1,9 @@
 <?php
+ob_start(); // Start output buffering
 session_start();
 include 'database.php'; // Include the database connection
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+// Check if 'REQUEST_METHOD' exists in the server array and if it's 'POST'
+if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Hash the password
     $email = $_POST['email'];
@@ -40,7 +41,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             echo "Error registering user: " . $stmt->error;
         }
     }
+} else {
+    echo "Invalid request method or 'REQUEST_METHOD' not set.";
 }
 
-// Close the connection
-$conn->close();
+ob_end_flush(); // End output buffering

@@ -1,30 +1,91 @@
+/* General reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+    background-color: #f4f4f4;
     color: #333;
 }
 
+/* Navbar */
 .navbar {
     background-color: #4CAF50;
-    overflow: hidden;
-    padding: 10px;
-    text-align: center;
+    color: #fff;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
-.navbar a {
-    padding: 14px 20px;
-    text-decoration: none;
+.navbar h2 {
+    margin: 0;
+}
+
+.logout {
+    background-color: #f44336;
     color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
 }
 
-.form-container {
-    max-width: 400px;
-    margin: 50px auto;
+.logout:hover {
+    background-color: #d32f2f;
+}
+
+/* Main container */
+.container {
+    max-width: 800px;
+    margin: 20px auto;
     padding: 20px;
-    background-color: white;
-    border: 1px solid #ddd;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
+/* Section styling */
+.section {
+    margin-bottom: 20px;
+}
+
+.section h3 {
+    color: #4CAF50;
+    margin-bottom: 10px;
+}
+
+/* Button container */
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.button {
+    text-decoration: none;
+    display: inline-block;
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #4CAF50;
+    border-radius: 5px;
     text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #45a049;
+}
+
+/* Posts and Notifications */
+.posts, .notifications {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
 }
