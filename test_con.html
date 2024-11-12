@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Test Database Connection</title>
+    <script>
+        function testConnection() {
+            fetch('test.php')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('connection-status').innerText = data.message;
+                })
+                .catch(error => {
+                    document.getElementById('connection-status').innerText = "Error: Unable to connect to the server. LOL";
+                    console.error("Error:", error);
+                });
+        }
+    </script>
+</head>
+
+<body>
+    <h2>Test Database Connection</h2>
+    <button onclick="testConnection()">Check Connection</button>
+    <p id="connection-status"></p>
+</body>
+
+</html>

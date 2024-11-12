@@ -1,30 +1,448 @@
+/* Reset styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
+    background-color: #f4f4f9;
+}
+
+/* Header styling */
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.back-button {
+    background-color: #ffffff;
+    color: #28a745;
+    padding: 5px 10px;
+    font-size: 14px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.welcome-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.welcome-message {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+.logout-button {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+/* Content layout */
+.content-container {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+    max-width: 1200px;
+    margin: auto;
+}
+
+.main-content {
+    flex: 3;
+}
+
+.sidebar {
+    flex: 1;
+    background: #ffffff;
+    padding: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+h2, h3 {
+    color: #333333;
+    margin-bottom: 15px;
+}
+
+/* Actions and Notifications styling */
+.actions, .notifications {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.action-button {
+    background-color: #28a745;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.action-button:hover {
+    background-color: #218838;
+}
+
+.posts {
+    background: #f4f4f9;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    color: #666666;
+}
+
+.notifications p, .posts p {
+    color: #666666;
+    font-size: 0.9em;
+}
+/* Form container styling for login and register pages */
+.form-container {
+    max-width: 400px;
+    margin: 100px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.form-container h2 {
+    margin-bottom: 20px;
+    font-size: 1.5em;
+    color: #333333;
+}
+
+.form-container label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    color: #666666;
+    font-weight: bold;
+}
+
+.form-container input[type="text"],
+.form-container input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 1em;
+}
+
+.button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: white;
+    font-size: 1em;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.button:hover {
+    background-color: #218838;
+}
+
+.form-container p {
+    margin-top: 15px;
+    color: #666666;
+}
+
+.form-container a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.form-container a:hover {
+    text-decoration: underline;
+}
+/* Friends page container */
+.friends-container {
+    max-width: 600px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Section headers */
+.friends-container h2,
+.friends-container h3 {
+    color: #333333;
+    margin-top: 20px;
+    font-size: 1.5em;
+}
+
+.friends-container h3 {
+    font-size: 1.2em;
+    color: #666666;
+}
+
+/* Input fields and buttons */
+.friends-page input[type="text"] {
+    width: 70%;
+    padding: 8px;
+    margin: 10px 0;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.friends-page button {
+    padding: 8px 16px;
+    margin-left: 10px;
+    background-color: #28a745;
+    color: white;
+    font-size: 0.9em;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.friends-page button:hover {
+    background-color: #218838;
+}
+
+/* Friend suggestions, requests, and list styling */
+.friend-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    border: 1px solid #dddddd;
+    border-radius: 4px;
+    margin: 5px 0;
     background-color: #f9f9f9;
+}
+
+.friends-section button {
+    background-color: #28a745;
+}
+
+.friend-section button:hover {
+    background-color: #218838;
+}
+
+/* Back button styling */
+.back-button {
+    display: inline-block;
+    margin-bottom: 20px;
+    padding: 5px 10px;
+    font-size: 0.9em;
+    color: #333333;
+    background-color: #f0f0f0;
+    border: 1px solid #cccccc;
+    border-radius: 4px;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    background-color: #e0e0e0;
+}
+
+/* Notifications and messages */
+.no-friends,
+.no-requests {
+    color: #888888;
+    font-style: italic;
+}
+.friends-page {
+    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.add-friend {
+    margin-bottom: 20px;
+}
+
+.friends-section {
+    display: flex;
+    justify-content: space-between;
+}
+
+.friend-list, .pending-requests, .friend-suggestions {
+    flex: 1;
+    padding: 10px;
+    background-color: #f9f9f9;
+    margin: 0 5px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+li {
+    margin: 8px 0;
+}
+
+button, a {
+    margin-top: 5px;
+    padding: 8px 16px;
+    margin-left: 10px;
+    background-color: #28a745;
+    color: white;
+    font-size: 0.9em;
+    font-weight: bold;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+button:hover, a:hover{
+    background-color: #218838;
+}
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #28a745;
+    color: #fff;
+}
+
+.header h1 {
+    margin-left: 20px;
+    font-size: 24px;
+}
+
+.back-button {
+    background-color: #fff;
+    border: none;
+    color: #218838;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.back-button:hover {
+    background-color: #ccc;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+/* Event Creation Form */
+.event-form {
+    width: 60%;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.event-form h2 {
+    margin-top: 0;
     color: #333;
 }
 
-.navbar {
-    background-color: #4CAF50;
-    overflow: hidden;
+.event-form label {
+    display: block;
+    margin-top: 10px;
+    color: #333;
+}
+
+.event-form input[type="text"],
+.event-form input[type="date"],
+.event-form input[type="time"],
+.event-form textarea {
+    width: 100%;
     padding: 10px;
-    text-align: center;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
 }
 
-.navbar a {
-    padding: 14px 20px;
-    text-decoration: none;
-    color: white;
+.datetime-fields {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 10px;
 }
 
-.form-container {
-    max-width: 400px;
-    margin: 50px auto;
+.create-event-button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.create-event-button:hover {
+    background-color: #218838;
+}
+
+/* Upcoming Events List */
+.events-list {
+    width: 35%;
     padding: 20px;
-    background-color: white;
-    border: 1px solid #ddd;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
-    text-align: center;
+.events-list h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.events-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.events-list li {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.events-list li h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.events-list li p {
+    margin: 5px 0;
+    color: #555;
 }
