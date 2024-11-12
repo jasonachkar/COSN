@@ -322,3 +322,127 @@ button, a {
 button:hover, a:hover{
     background-color: #218838;
 }
+/* Header */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    background-color: #28a745;
+    color: #fff;
+}
+
+.header h1 {
+    margin-left: 20px;
+    font-size: 24px;
+}
+
+.back-button {
+    background-color: #fff;
+    border: none;
+    color: #218838;
+    padding: 8px 12px;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.back-button:hover {
+    background-color: #ccc;
+}
+
+/* Container */
+.container {
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+/* Event Creation Form */
+.event-form {
+    width: 60%;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.event-form h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.event-form label {
+    display: block;
+    margin-top: 10px;
+    color: #333;
+}
+
+.event-form input[type="text"],
+.event-form input[type="date"],
+.event-form input[type="time"],
+.event-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.datetime-fields {
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.create-event-button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+}
+
+.create-event-button:hover {
+    background-color: #218838;
+}
+
+/* Upcoming Events List */
+.events-list {
+    width: 35%;
+    padding: 20px;
+    background-color: #f8f8f8;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.events-list h2 {
+    margin-top: 0;
+    color: #333;
+}
+
+.events-list ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.events-list li {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+.events-list li h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.events-list li p {
+    margin: 5px 0;
+    color: #555;
+}
