@@ -3,13 +3,14 @@ session_start();
 include 'database.php'; // Include database connection
 
 // Ensure user is logged in
-if (!isset($_SESSION['username'])) {
-    header("Location: login.php");
+if (!isset($_SESSION['username']) || !isset($_SESSION['user_id'])) {
+    header("Location: login.html");
     exit();
 }
+$backUrl = isset($_SESSION['username']) ? 'home.php' : 'index.php';
 
 $username = $_SESSION['username'];
-$userId = $_SESSION['user_id']; // Assuming user_id is stored in session upon login
+$userId = $_SESSION['user_id'];
 
 // Fetch friend list
 $friendQuery = "
@@ -37,7 +38,6 @@ $pendingRequests = $pendingStmt->get_result();
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['friend_username'])) {
     $friendUsername = $_POST['friend_username'];
 
-    // Find friend's ID by username
     $userQuery = "SELECT id FROM members WHERE username = ?";
     $userStmt = $conn->prepare($userQuery);
     $userStmt->bind_param("s", $friendUsername);
@@ -47,7 +47,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['friend_username'])) {
     if ($userResult->num_rows > 0) {
         $friendId = $userResult->fetch_assoc()['id'];
 
-        // Insert friend request
         $requestQuery = "INSERT INTO friends (user_id, friend_id, status) VALUES (?, ?, 'pending')";
         $requestStmt = $conn->prepare($requestQuery);
         $requestStmt->bind_param("ii", $userId, $friendId);
@@ -62,27 +61,46 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['friend_username'])) {
     }
 }
 
-// Accept friend request
+// Accept and Decline Friend Requests
 if (isset($_GET['accept']) && is_numeric($_GET['accept'])) {
     $requestId = $_GET['accept'];
     $acceptQuery = "UPDATE friends SET status = 'accepted' WHERE id = ?";
     $acceptStmt = $conn->prepare($acceptQuery);
     $acceptStmt->bind_param("i", $requestId);
     $acceptStmt->execute();
-    header("Location: friends.php"); // Refresh the page
+    header("Location: friends.php");
     exit();
 }
 
-// Decline friend request
 if (isset($_GET['decline']) && is_numeric($_GET['decline'])) {
     $requestId = $_GET['decline'];
     $declineQuery = "UPDATE friends SET status = 'declined' WHERE id = ?";
     $declineStmt = $conn->prepare($declineQuery);
     $declineStmt->bind_param("i", $requestId);
     $declineStmt->execute();
-    header("Location: friends.php"); // Refresh the page
+    header("Location: friends.php");
     exit();
 }
+
+// Friend Suggestions
+$suggestionsQuery = "
+    SELECT username 
+    FROM members 
+    WHERE id != ? 
+      AND id NOT IN (
+          SELECT friend_id FROM friends WHERE user_id = ? 
+          UNION 
+          SELECT user_id FROM friends WHERE friend_id = ?
+          UNION
+          SELECT friend_id FROM friends WHERE user_id = ? AND status = 'pending'
+          UNION 
+          SELECT user_id FROM friends WHERE friend_id = ? AND status = 'pending'
+      )
+    ORDER BY RAND() LIMIT 5";
+$suggestionsStmt = $conn->prepare($suggestionsQuery);
+$suggestionsStmt->bind_param("iiiii", $userId, $userId, $userId, $userId, $userId);
+$suggestionsStmt->execute();
+$suggestions = $suggestionsStmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -93,20 +111,23 @@ if (isset($_GET['decline']) && is_numeric($_GET['decline'])) {
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Friends</h1>
+<button class="back-button" onclick="window.location.href='<?php echo $backUrl; ?>';">
+    &larr; Back
+</button>
+<div class="friends-page">
+    <!-- Add Friend Form -->
+    <div class="add-friend">
+        <h2>Add a Friend</h2>
+        <form method="POST" action="friends.php">
+            <input type="text" name="friend_username" placeholder="Enter friend's username" required>
+            <button type="submit">Send Request</button>
+        </form>
+    </div>
 
-        <!-- Add Friend Form -->
-        <div class="add-friend">
-            <h3>Add a Friend</h3>
-            <form method="POST" action="friends.php">
-                <input type="text" name="friend_username" placeholder="Enter friend's username" required>
-                <button type="submit">Send Request</button>
-            </form>
-        </div>
-
-        <!-- Friend List -->
-        <div class="friends-list">
+    <!-- Friends Section Container -->
+    <div class="friends-section">
+        <!-- Your Friends -->
+        <div class="friend-list">
             <h3>Your Friends</h3>
             <?php if ($friends->num_rows > 0): ?>
                 <ul>
@@ -136,6 +157,27 @@ if (isset($_GET['decline']) && is_numeric($_GET['decline'])) {
                 <p>No pending friend requests.</p>
             <?php endif; ?>
         </div>
+
+        <!-- Friend Suggestions -->
+        <div class="friend-suggestions">
+            <h3>Friend Suggestions</h3>
+            <?php if ($suggestions->num_rows > 0): ?>
+                <ul>
+                    <?php while ($suggested = $suggestions->fetch_assoc()): ?>
+                        <li>
+                            <?php echo htmlspecialchars($suggested['username']); ?>
+                            <form method="POST" action="friends.php" style="display:inline;">
+                                <input type="hidden" name="friend_username" value="<?php echo htmlspecialchars($suggested['username']); ?>">
+                                <button type="submit">Add Friend</button>
+                            </form>
+                        </li>
+                    <?php endwhile; ?>
+                </ul>
+            <?php else: ?>
+                <p>No suggestions available.</p>
+            <?php endif; ?>
+        </div>
     </div>
+</div>
 </body>
 </html>

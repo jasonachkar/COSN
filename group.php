@@ -10,6 +10,7 @@ if (!isset($_SESSION['username'])) {
 
 // Get the group ID from URL
 $groupId = $_GET['id'];
+$backUrl = isset($_SESSION['username']) ? 'home.php' : 'index.php';
 
 // Retrieve group details and posts
 $groupQuery = "SELECT * FROM `groups` WHERE id = ?";
@@ -36,6 +37,12 @@ $posts = $postStmt->get_result();
 </head>
 
 <body>
+<button onclick="window.location.href='<?php echo $backUrl; ?>';" 
+        style="margin: 10px; padding: 5px 10px; font-size: 14px; cursor: pointer;">
+    &larr; Back
+</button>
+
+
     <h2><?php echo htmlspecialchars($group['name']); ?></h2>
     <p><?php echo htmlspecialchars($group['description']); ?></p>
 
