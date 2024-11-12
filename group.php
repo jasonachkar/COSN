@@ -1,22 +1,59 @@
 <?php
 session_start();
-include 'database.php';
+include 'database.php'; // Include the database connection
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_SESSION['username'])) {
-    $groupName = $_POST['group_name'];
-    $description = $_POST['description'];
-    $owner = $_SESSION['username'];
-
-    // Insert new group
-    $query = "INSERT INTO groups (name, description, owner) VALUES (?, ?, ?)";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("sss", $groupName, $description, $owner);
-
-    if ($stmt->execute()) {
-        echo "Group created successfully.";
-        header("Location: groups.php"); // Redirect to groups page
-    } else {
-        echo "Error creating group.";
-    }
+// Ensure user is logged in
+if (!isset($_SESSION['username'])) {
+    header("Location: login.html");
+    exit();
 }
+
+// Get the group ID from URL
+$groupId = $_GET['id'];
+
+// Retrieve group details and posts
+$groupQuery = "SELECT * FROM `groups` WHERE id = ?";
+$postQuery = "SELECT * FROM posts WHERE group_id = ? ORDER BY created_at DESC";
+
+$groupStmt = $conn->prepare($groupQuery);
+$groupStmt->bind_param("i", $groupId);
+$groupStmt->execute();
+$group = $groupStmt->get_result()->fetch_assoc();
+
+$postStmt = $conn->prepare($postQuery);
+$postStmt->bind_param("i", $groupId);
+$postStmt->execute();
+$posts = $postStmt->get_result();
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title><?php echo htmlspecialchars($group['name']); ?> - Group</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+
+<body>
+    <h2><?php echo htmlspecialchars($group['name']); ?></h2>
+    <p><?php echo htmlspecialchars($group['description']); ?></p>
+
+    <h3>Posts</h3>
+    <div class="posts">
+        <?php while ($post = $posts->fetch_assoc()): ?>
+            <div class="post">
+                <h4><?php echo htmlspecialchars($post['title']); ?></h4>
+                <p><?php echo htmlspecialchars($post['content']); ?></p>
+                <span>Posted on: <?php echo $post['created_at']; ?></span>
+            </div>
+        <?php endwhile; ?>
+    </div>
+</body>
+
+</html>
+
+<?php
+// Close the connection
+$conn->close();
 ?>

@@ -1,22 +1,32 @@
 <?php
 session_start();
-include 'database.php';
+include 'database.php'; // Include the database connection
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
-    
-    $query = "SELECT * FROM members WHERE username = ? AND password = ?";
+
+    // Check user credentials
+    $query = "SELECT * FROM members WHERE username = ?";
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("ss", $username, $password);
+    $stmt->bind_param("s", $username);
     $stmt->execute();
     $result = $stmt->get_result();
-    
+
     if ($result->num_rows > 0) {
-        $_SESSION['username'] = $username;
-        header("Location: profile.php");
+        $user = $result->fetch_assoc();
+        // Verify password
+        if (password_verify($password, $user['password'])) {
+            $_SESSION['username'] = $username;
+            header("Location: home.php");
+            exit();
+        } else {
+            echo "Invalid username or password.";
+        }
     } else {
-        echo "<p>Invalid login credentials</p>";
+        echo "Invalid username or password.";
     }
 }
-?>
+
+// Close the connection
+$conn->close();
