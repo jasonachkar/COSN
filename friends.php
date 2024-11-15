@@ -25,14 +25,17 @@ $friends = $friendStmt->get_result();
 
 // Fetch pending friend requests
 $pendingQuery = "
-    SELECT m.username, f.id AS friend_request_id 
+    SELECT m.username, f.id AS friend_request_id, f.user_id, f.friend_id, f.status 
     FROM members m 
-    JOIN friends f ON m.id = f.user_id 
-    WHERE f.friend_id = ? AND f.status = 'pending'";
+    JOIN friends f ON m.id = f.user_id OR m.id = f.friend_id
+    WHERE (f.user_id = ? OR f.friend_id = ?) 
+      AND f.status = 'pending'
+      AND m.id != ?";
 $pendingStmt = $conn->prepare($pendingQuery);
-$pendingStmt->bind_param("i", $userId);
+$pendingStmt->bind_param("iii", $userId, $userId, $userId);
 $pendingStmt->execute();
 $pendingRequests = $pendingStmt->get_result();
+
 
 // Add friend request handler
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['friend_username'])) {
@@ -157,6 +160,24 @@ $suggestions = $suggestionsStmt->get_result();
                 <p>No pending friend requests.</p>
             <?php endif; ?>
         </div>
+<h3 class="pending-requests">Pending Friend Requests</h3>
+<?php if ($pendingRequests->num_rows > 0): ?>
+    <ul>
+        <?php while ($request = $pendingRequests->fetch_assoc()): ?>
+            <li>
+                <?php echo htmlspecialchars($request['username']); ?>
+                <?php if ($request['user_id'] == $userId): ?>
+                    <span class="status-text">Waiting until this user accepts your request</span>
+                <?php else: ?>
+                    <a class="form-container" href="friends.php?accept=<?php echo $request['friend_request_id']; ?>">Accept</a>
+                    <a class="form-container" href="friends.php?decline=<?php echo $request['friend_request_id']; ?>">Decline</a>
+                <?php endif; ?>
+            </li>
+        <?php endwhile; ?>
+    </ul>
+<?php else: ?>
+    <p>No pending friend requests.</p>
+<?php endif; ?>
 
         <!-- Friend Suggestions -->
         <div class="friend-suggestions">
