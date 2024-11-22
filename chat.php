@@ -34,11 +34,11 @@ $friendUsername = $friendResult->fetch_assoc()['username'];
 
 // Fetch conversation history
 $messagesQuery = "
-    SELECT sender_id, receiver_id, message, created_at 
+    SELECT sender_id, recipient_id, message, sent_at 
     FROM messages 
-    WHERE (sender_id = ? AND receiver_id = ?) 
-       OR (sender_id = ? AND receiver_id = ?)
-    ORDER BY created_at ASC";
+    WHERE (sender_id = ? AND recipient_id = ?) 
+       OR (sender_id = ? AND recipient_id = ?)
+    ORDER BY sent_at ASC";
 $messagesStmt = $conn->prepare($messagesQuery);
 $messagesStmt->bind_param("iiii", $userId, $friendId, $friendId, $userId);
 $messagesStmt->execute();
@@ -48,7 +48,7 @@ $messages = $messagesStmt->get_result();
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message'])) {
     $message = $_POST['message'];
 
-    $sendMessageQuery = "INSERT INTO messages (sender_id, receiver_id, message, created_at) VALUES (?, ?, ?, NOW())";
+    $sendMessageQuery = "INSERT INTO messages (sender_id, recipient_id, message, sent_at) VALUES (?, ?, ?, NOW())";
     $sendMessageStmt = $conn->prepare($sendMessageQuery);
     $sendMessageStmt->bind_param("iis", $userId, $friendId, $message);
 
@@ -56,7 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message'])) {
         header("Location: chat.php?friend_id=$friendId"); // Refresh to show the new message
         exit();
     } else {
-        echo "Error sending message.";
+        echo "Error sending message: " . $sendMessageStmt->error;
     }
 }
 ?>
@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message'])) {
                 <?php while ($msg = $messages->fetch_assoc()): ?>
                     <div class="message <?php echo $msg['sender_id'] == $userId ? 'sent' : 'received'; ?>">
                         <p><?php echo htmlspecialchars($msg['message']); ?></p>
-                        <span class="timestamp"><?php echo date('Y-m-d H:i', strtotime($msg['created_at'])); ?></span>
+                        <span class="timestamp"><?php echo date('Y-m-d H:i', strtotime($msg['sent_at'])); ?></span>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>

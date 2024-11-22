@@ -7,38 +7,46 @@ if (!isset($_SESSION['username']) || !isset($_SESSION['user_id'])) {
     header("Location: login.html");
     exit();
 }
-$backUrl = isset($_SESSION['username']) ? 'home.php' : 'index.php';
 
 $username = $_SESSION['username'];
 $userId = $_SESSION['user_id'];
+$backUrl = isset($_SESSION['username']) ? 'home.php' : 'index.php';
 
 // Fetch friend list
 $friendQuery = "
-    SELECT m.username 
+    SELECT m.id, m.username 
     FROM members m 
-    JOIN friends f ON m.id = f.friend_id 
-    WHERE f.user_id = ? AND f.status = 'accepted'";
+    JOIN friends f ON (m.id = f.friend_id AND f.user_id = ?) OR (m.id = f.user_id AND f.friend_id = ?) 
+    WHERE f.status = 'accepted'";
 $friendStmt = $conn->prepare($friendQuery);
-$friendStmt->bind_param("i", $userId);
+$friendStmt->bind_param("ii", $userId, $userId);
 $friendStmt->execute();
 $friends = $friendStmt->get_result();
 
 // Fetch pending friend requests
 $pendingQuery = "
-    SELECT m.username, f.id AS friend_request_id, f.user_id, f.friend_id, f.status 
+    SELECT m.username, f.id AS friend_request_id, f.user_id 
     FROM members m 
-    JOIN friends f ON m.id = f.user_id OR m.id = f.friend_id
-    WHERE (f.user_id = ? OR f.friend_id = ?) 
-      AND f.status = 'pending'
-      AND m.id != ?";
+    JOIN friends f ON m.id = f.user_id 
+    WHERE f.friend_id = ? AND f.status = 'pending'";
 $pendingStmt = $conn->prepare($pendingQuery);
-$pendingStmt->bind_param("iii", $userId, $userId, $userId);
+$pendingStmt->bind_param("i", $userId);
 $pendingStmt->execute();
 $pendingRequests = $pendingStmt->get_result();
 
+// Fetch sent friend requests
+$sentRequestsQuery = "
+    SELECT m.username 
+    FROM members m 
+    JOIN friends f ON m.id = f.friend_id 
+    WHERE f.user_id = ? AND f.status = 'pending'";
+$sentRequestsStmt = $conn->prepare($sentRequestsQuery);
+$sentRequestsStmt->bind_param("i", $userId);
+$sentRequestsStmt->execute();
+$sentRequests = $sentRequestsStmt->get_result();
 
 // Add friend request handler
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['friend_username'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['friend_username'])) {
     $friendUsername = $_POST['friend_username'];
 
     $userQuery = "SELECT id FROM members WHERE username = ?";
@@ -55,7 +63,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['friend_username'])) {
         $requestStmt->bind_param("ii", $userId, $friendId);
 
         if ($requestStmt->execute()) {
-            echo "Friend request sent to $friendUsername!";
+            header("Location: friends.php?success=Friend request sent!");
+            exit();
         } else {
             echo "Error sending friend request.";
         }
@@ -85,25 +94,32 @@ if (isset($_GET['decline']) && is_numeric($_GET['decline'])) {
     exit();
 }
 
-// Friend Suggestions
-$suggestionsQuery = "
-    SELECT username 
-    FROM members 
-    WHERE id != ? 
-      AND id NOT IN (
-          SELECT friend_id FROM friends WHERE user_id = ? 
-          UNION 
-          SELECT user_id FROM friends WHERE friend_id = ?
-          UNION
-          SELECT friend_id FROM friends WHERE user_id = ? AND status = 'pending'
-          UNION 
-          SELECT user_id FROM friends WHERE friend_id = ? AND status = 'pending'
-      )
-    ORDER BY RAND() LIMIT 5";
-$suggestionsStmt = $conn->prepare($suggestionsQuery);
-$suggestionsStmt->bind_param("iiiii", $userId, $userId, $userId, $userId, $userId);
-$suggestionsStmt->execute();
-$suggestions = $suggestionsStmt->get_result();
+// Block a member
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'block_member') {
+    $blockedMemberId = $_POST['blocked_member_id'];
+
+    $blockQuery = "INSERT INTO blocked_members (member_id, blocked_member_id) VALUES (?, ?)";
+    $blockStmt = $conn->prepare($blockQuery);
+    $blockStmt->bind_param("ii", $userId, $blockedMemberId);
+
+    if ($blockStmt->execute()) {
+        header("Location: friends.php?success=Member blocked successfully");
+        exit();
+    } else {
+        echo "Error: " . $blockStmt->error;
+    }
+}
+
+// Fetch blocked members
+$blockedQuery = "
+    SELECT m.username 
+    FROM members m 
+    JOIN blocked_members bm ON m.id = bm.blocked_member_id 
+    WHERE bm.member_id = ?";
+$blockedStmt = $conn->prepare($blockedQuery);
+$blockedStmt->bind_param("i", $userId);
+$blockedStmt->execute();
+$blockedMembers = $blockedStmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -118,7 +134,7 @@ $suggestions = $suggestionsStmt->get_result();
     &larr; Back
 </button>
 <div class="friends-page">
-    <!-- Add Friend Form -->
+    <!-- Add Friend -->
     <div class="add-friend">
         <h2>Add a Friend</h2>
         <form method="POST" action="friends.php">
@@ -127,77 +143,71 @@ $suggestions = $suggestionsStmt->get_result();
         </form>
     </div>
 
-    <!-- Friends Section Container -->
-    <div class="friends-section">
-        <!-- Your Friends -->
-        <div class="friend-list">
-            <h3>Your Friends</h3>
-            <?php if ($friends->num_rows > 0): ?>
-                <ul>
-                    <?php while ($friend = $friends->fetch_assoc()): ?>
-                        <li><?php echo htmlspecialchars($friend['username']); ?></li>
-                    <?php endwhile; ?>
-                </ul>
-            <?php else: ?>
-                <p>You have no friends yet.</p>
-            <?php endif; ?>
-        </div>
+    <!-- Friend List -->
+    <div class="friend-list">
+        <h2>Your Friends</h2>
+        <?php if ($friends->num_rows > 0): ?>
+            <ul>
+                <?php while ($friend = $friends->fetch_assoc()): ?>
+                    <li>
+                        <?php echo htmlspecialchars($friend['username']); ?>
+                        <form method="POST" action="friends.php" style="display:inline;">
+                            <input type="hidden" name="action" value="block_member">
+                            <input type="hidden" name="blocked_member_id" value="<?php echo $friend['id']; ?>">
+                            <button type="submit">Block</button>
+                        </form>
+                    </li>
+                <?php endwhile; ?>
+            </ul>
+        <?php else: ?>
+            <p>No friends yet.</p>
+        <?php endif; ?>
+    </div>
 
-        <!-- Pending Friend Requests -->
-        <div class="pending-requests">
-            <h3>Pending Friend Requests</h3>
-            <?php if ($pendingRequests->num_rows > 0): ?>
-                <ul>
-                    <?php while ($request = $pendingRequests->fetch_assoc()): ?>
-                        <li>
-                            <?php echo htmlspecialchars($request['username']); ?>
-                            <a href="friends.php?accept=<?php echo $request['friend_request_id']; ?>">Accept</a>
-                            <a href="friends.php?decline=<?php echo $request['friend_request_id']; ?>">Decline</a>
-                        </li>
-                    <?php endwhile; ?>
-                </ul>
-            <?php else: ?>
-                <p>No pending friend requests.</p>
-            <?php endif; ?>
-        </div>
-<h3 class="pending-requests">Pending Friend Requests</h3>
-<?php if ($pendingRequests->num_rows > 0): ?>
-    <ul>
-        <?php while ($request = $pendingRequests->fetch_assoc()): ?>
-            <li>
-                <?php echo htmlspecialchars($request['username']); ?>
-                <?php if ($request['user_id'] == $userId): ?>
-                    <span class="status-text">Waiting until this user accepts your request</span>
-                <?php else: ?>
-                    <a class="form-container" href="friends.php?accept=<?php echo $request['friend_request_id']; ?>">Accept</a>
-                    <a class="form-container" href="friends.php?decline=<?php echo $request['friend_request_id']; ?>">Decline</a>
-                <?php endif; ?>
-            </li>
-        <?php endwhile; ?>
-    </ul>
-<?php else: ?>
-    <p>No pending friend requests.</p>
-<?php endif; ?>
+    <!-- Pending Requests -->
+    <div class="pending-requests">
+        <h2>Pending Friend Requests</h2>
+        <?php if ($pendingRequests->num_rows > 0): ?>
+            <ul>
+                <?php while ($request = $pendingRequests->fetch_assoc()): ?>
+                    <li>
+                        <?php echo htmlspecialchars($request['username']); ?>
+                        <a href="friends.php?accept=<?php echo $request['friend_request_id']; ?>">Accept</a>
+                        <a href="friends.php?decline=<?php echo $request['friend_request_id']; ?>">Decline</a>
+                    </li>
+                <?php endwhile; ?>
+            </ul>
+        <?php else: ?>
+            <p>No pending requests.</p>
+        <?php endif; ?>
+    </div>
 
-        <!-- Friend Suggestions -->
-        <div class="friend-suggestions">
-            <h3>Friend Suggestions</h3>
-            <?php if ($suggestions->num_rows > 0): ?>
-                <ul>
-                    <?php while ($suggested = $suggestions->fetch_assoc()): ?>
-                        <li>
-                            <?php echo htmlspecialchars($suggested['username']); ?>
-                            <form method="POST" action="friends.php" style="display:inline;">
-                                <input type="hidden" name="friend_username" value="<?php echo htmlspecialchars($suggested['username']); ?>">
-                                <button type="submit">Add Friend</button>
-                            </form>
-                        </li>
-                    <?php endwhile; ?>
-                </ul>
-            <?php else: ?>
-                <p>No suggestions available.</p>
-            <?php endif; ?>
-        </div>
+    <!-- Sent Requests -->
+    <div class="sent-requests">
+        <h2>Sent Friend Requests</h2>
+        <?php if ($sentRequests->num_rows > 0): ?>
+            <ul>
+                <?php while ($sentRequest = $sentRequests->fetch_assoc()): ?>
+                    <li><?php echo htmlspecialchars($sentRequest['username']); ?> - Waiting for response</li>
+                <?php endwhile; ?>
+            </ul>
+        <?php else: ?>
+            <p>No sent requests.</p>
+        <?php endif; ?>
+    </div>
+
+    <!-- Blocked Members -->
+    <div class="blocked-members">
+        <h2>Blocked Members</h2>
+        <?php if ($blockedMembers->num_rows > 0): ?>
+            <ul>
+                <?php while ($blocked = $blockedMembers->fetch_assoc()): ?>
+                    <li><?php echo htmlspecialchars($blocked['username']); ?></li>
+                <?php endwhile; ?>
+            </ul>
+        <?php else: ?>
+            <p>No blocked members.</p>
+        <?php endif; ?>
     </div>
 </div>
 </body>

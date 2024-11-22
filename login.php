@@ -33,3 +33,27 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 }
 ?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - COSN</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Login to COSN</h2>
+        <form action="login.php" method="POST">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required>
+            
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required>
+            
+            <button type="submit" class="button">Login</button>
+        </form>
+        <p>Don't have an account? <a href="register.php">Register here</a>.</p>
+    </div>
+</body>
+</html>
