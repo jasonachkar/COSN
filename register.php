@@ -46,3 +46,31 @@ if (isset($_SERVER['REQUEST_METHOD']) && $_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 ob_end_flush(); // End output buffering
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register - COSN</title>
+    <link rel="stylesheet" href="styles/styles.css">
+</head>
+<body>
+    <div class="form-container">
+        <h2>Create Your COSN Account</h2>
+        <form action="register.php" method="POST">
+            <label for="username">Username</label>
+            <input type="text" name="username" id="username" required>
+            
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" required>
+            
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" required>
+            
+            <button type="submit" class="button">Register</button>
+        </form>
+        <p>Already have an account? <a href="login.html">Login here</a>.</p>
+    </div>
+</body>
+</html>
