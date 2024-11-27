@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 <head>
     <meta charset="UTF-8">
     <title>Login - COSN</title>
-    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="/COSN/styles/styles.css">
 </head>
 <body>
     <div class="form-container">
