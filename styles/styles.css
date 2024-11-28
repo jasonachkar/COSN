@@ -8,6 +8,7 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f4f4f9;
+
 }
 
 /* Global Header */
@@ -39,7 +40,6 @@ body {
 }
 
 .welcome-container {
-    display: flex;
     align-items: center;
     gap: 10px;
 }
@@ -381,3 +381,138 @@ form {
     text-overflow: ellipsis;
     white-space: nowrap; /* Prevents text wrapping */
 }
+
+/* ----------------------------------------- WELCOME PAGE BELOW -----------------------------------------------*/
+.welcome-container {
+    width: 80%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin-top: 50px;
+}
+
+.welcome-title {
+    background-color: #28a745; 
+    color: white; 
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/*layout */
+.content {
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+    margin-top: 20px;
+    gap: 20px;
+}
+
+.description {
+    flex: 2; 
+    background-color: #f8f9fa; 
+    padding: 20px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #232523;
+}
+
+.login-box {
+    flex: 1; 
+    display: flex;
+    flex-direction: column; 
+    gap: 35px; 
+    align-items: center; 
+    justify-content: center; 
+    height: 100%; 
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 1rem;
+    border-radius: 25px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-align: center;
+    width: 30%; 
+}
+
+.button.primary {
+    background-color: #28a745; 
+    color: #fff; 
+    border: none;
+}
+
+.button.primary:hover {
+    background-color: #20983c;
+    color: #fff;
+}
+
+/* ----------------------------------------- LOGIN PAGE BELOW ----------------------------------------- */
+
+.form-container {
+    max-width: 400px; 
+    margin: 50px auto; 
+    padding: 20px;
+    background-color: white; 
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /*shadow */
+    text-align: center;
+}
+
+.form-container h2 {
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #3c3c42; 
+}
+
+.form-container label {
+    display: block;
+    text-align: left;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #3c3c42;
+}
+
+.form-container input[type="text"],
+.form-container input[type="password"],
+.form-container input[type="email"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.form-container input:focus {
+    border-color: #3498db; 
+    outline: none;
+}
+
+.form-container p {
+    margin-top: 15px;
+    font-size: 0.9rem;
+    color: black;
+}
+
+.form-container a {
+    color: #3498db;
+    text-decoration: none;
+}
+
+.form-container a:hover {
+    text-decoration: underline;
+}
+
+
+
+
+
