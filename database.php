@@ -7,7 +7,7 @@ $servername = "localhost";
 $username = "root";
 $password = "admin";
 $dbname = "cosn";
-$port = 3306;
+$port = 5555;
 
 // Create a new connection
 $conn = new mysqli($servername, $username, $password, $dbname,$port);
@@ -18,5 +18,4 @@ if ($conn->connect_error) {
 } else {
 
 }
-echo "Connected successfully";
 ?>

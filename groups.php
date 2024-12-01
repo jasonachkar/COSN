@@ -14,19 +14,77 @@ $userRole = $_SESSION['role'] ?? 'junior';
 $backUrl = 'home.php';
 
 // Handle creating a new group
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create') {
-    $groupName = $_POST['name'];
-    $description = $_POST['description'];
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if ($_POST['action'] === 'create') {
+        $groupName = $_POST['name'];
+        $description = $_POST['description'];
 
-    $createGroupQuery = "INSERT INTO `groups` (name, description, created_by) VALUES (?, ?, ?)";
-    $createGroupStmt = $conn->prepare($createGroupQuery);
-    $createGroupStmt->bind_param("ssi", $groupName, $description, $userId);
+        $createGroupQuery = "INSERT INTO `groups` (name, description, created_by) VALUES (?, ?, ?)";
+        $createGroupStmt = $conn->prepare($createGroupQuery);
+        $createGroupStmt->bind_param("ssi", $groupName, $description, $userId);
 
-    if ($createGroupStmt->execute()) {
-        header("Location: groups.php?success=Group created successfully.");
-        exit();
-    } else {
-        echo "Error creating group: " . $createGroupStmt->error;
+        if ($createGroupStmt->execute()) {
+            header("Location: groups.php?success=Group created successfully.");
+            exit();
+        } else {
+            echo "Error creating group: " . $createGroupStmt->error;
+        }
+    }
+    // Handle editing a group
+    elseif ($_POST['action'] === 'edit') {
+        $groupId = $_POST['group_id'];
+        $groupName = $_POST['name'];
+        $description = $_POST['description'];
+
+        // Check if user is admin or group creator
+        $checkPermissionQuery = "SELECT created_by FROM `groups` WHERE id = ?";
+        $checkPermissionStmt = $conn->prepare($checkPermissionQuery);
+        $checkPermissionStmt->bind_param("i", $groupId);
+        $checkPermissionStmt->execute();
+        $result = $checkPermissionStmt->get_result();
+        $group = $result->fetch_assoc();
+
+        if ($userRole === 'admin' || $group['created_by'] === $userId) {
+            $updateQuery = "UPDATE `groups` SET name = ?, description = ? WHERE id = ?";
+            $updateStmt = $conn->prepare($updateQuery);
+            $updateStmt->bind_param("ssi", $groupName, $description, $groupId);
+
+            if ($updateStmt->execute()) {
+                header("Location: groups.php?success=Group updated successfully.");
+                exit();
+            } else {
+                echo "Error updating group: " . $updateStmt->error;
+            }
+        } else {
+            echo "Permission denied.";
+        }
+    }
+    // Handle deleting a group
+    elseif ($_POST['action'] === 'delete') {
+        $groupId = $_POST['group_id'];
+
+        // Check if user is admin or group creator
+        $checkPermissionQuery = "SELECT created_by FROM `groups` WHERE id = ?";
+        $checkPermissionStmt = $conn->prepare($checkPermissionQuery);
+        $checkPermissionStmt->bind_param("i", $groupId);
+        $checkPermissionStmt->execute();
+        $result = $checkPermissionStmt->get_result();
+        $group = $result->fetch_assoc();
+
+        if ($userRole === 'admin' || $group['created_by'] === $userId) {
+            $deleteQuery = "DELETE FROM `groups` WHERE id = ?";
+            $deleteStmt = $conn->prepare($deleteQuery);
+            $deleteStmt->bind_param("i", $groupId);
+
+            if ($deleteStmt->execute()) {
+                header("Location: groups.php?success=Group deleted successfully.");
+                exit();
+            } else {
+                echo "Error deleting group: " . $deleteStmt->error;
+            }
+        } else {
+            echo "Permission denied.";
+        }
     }
 }
 
@@ -59,8 +117,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
         // Add the member to the group_members table
         $addMemberQuery = "
-            INSERT INTO group_members (group_id, member_id, username, joined_at)
-            SELECT group_id, member_id, (SELECT username FROM members WHERE id = member_id), NOW()
+            INSERT INTO group_members (group_id, member_id, joined_at)
+            SELECT group_id, member_id, NOW()
             FROM group_requests WHERE id = ?";
         $addMemberStmt = $conn->prepare($addMemberQuery);
         $addMemberStmt->bind_param("i", $requestId);
@@ -81,7 +139,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             header("Location: groups.php?success=Member denied successfully.");
             exit();
         } else {
-            echo "Error: " . $conn->error;
+            echo "Error: " . $denyStmt->error;
         }
     }
 }
@@ -131,16 +189,6 @@ $adminGroupsStmt = $conn->prepare($adminGroupsQuery);
 $adminGroupsStmt->bind_param("is", $userId, $userRole);
 $adminGroupsStmt->execute();
 $adminGroups = $adminGroupsStmt->get_result();
-
-$activeMembersQuery = "
-    SELECT gm.username, gm.status
-    FROM group_members gm
-    WHERE gm.group_id = ? AND gm.status = 'active'";
-$activeMembersStmt = $conn->prepare($activeMembersQuery);
-$activeMembersStmt->bind_param("i", $groupId);
-$activeMembersStmt->execute();
-$activeMembers = $activeMembersStmt->get_result();
-
 ?>
 
 <!DOCTYPE html>
@@ -149,6 +197,19 @@ $activeMembers = $activeMembersStmt->get_result();
     <meta charset="UTF-8">
     <title>Groups Management - COSN</title>
     <link rel="stylesheet" href="styles/styles.css">
+    <style>
+        .group-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .edit-form {
+            display: none;
+        }
+        .edit-form.active {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="header">
@@ -170,59 +231,85 @@ $activeMembers = $activeMembersStmt->get_result();
             </form>
         </div>
 
-        <?php if ($adminGroups->num_rows > 0): ?>
-    <div class="section">
-        <h2>Groups You Have Created</h2>
-        <ul>
-            <?php while ($group = $adminGroups->fetch_assoc()): ?>
-            <li>
-                <strong><?php echo htmlspecialchars($group['name']); ?></strong>
-                <p><?php echo htmlspecialchars($group['description']); ?></p>
-                <details>
-                    <summary>View Join Requests</summary>
-                    <?php
-                    $requestsQuery = "
-                        SELECT gr.id AS request_id, m.username
-                        FROM group_requests gr
-                        JOIN members m ON gr.member_id = m.id
-                        WHERE gr.group_id = ? AND gr.status = 'pending'";
-                    $requestsStmt = $conn->prepare($requestsQuery);
-                    $requestsStmt->bind_param("i", $group['id']);
-                    $requestsStmt->execute();
-                    $requests = $requestsStmt->get_result();
-
-                    if ($requests->num_rows > 0):
-                    ?>
-                    <ul>
-                        <?php while ($request = $requests->fetch_assoc()): ?>
+        <!-- Section: Groups You Have Created -->
+        <div class="section">
+            <h2>Groups You Have Created</h2>
+            <?php if ($adminGroups->num_rows > 0): ?>
+                <ul>
+                    <?php while ($group = $adminGroups->fetch_assoc()): ?>
                         <li>
-                            <?php echo htmlspecialchars($request['username']); ?>
-                            <form method="POST" action="groups.php" style="display:inline;">
-                                <input type="hidden" name="action" value="approve">
-                                <input type="hidden" name="request_id" value="<?php echo $request['request_id']; ?>">
-                                <input type="hidden" name="group_id" value="<?php echo $group['id']; ?>">
-                                <button type="submit">Accept</button>
-                            </form>
-                            <form method="POST" action="groups.php" style="display:inline;">
-                                <input type="hidden" name="action" value="deny">
-                                <input type="hidden" name="request_id" value="<?php echo $request['request_id']; ?>">
-                                <input type="hidden" name="group_id" value="<?php echo $group['id']; ?>">
-                                <button type="submit">Deny</button>
-                            </form>
+                            <strong><?php echo htmlspecialchars($group['name']); ?></strong>
+                            <p><?php echo htmlspecialchars($group['description']); ?></p>
+                            
+                            <!-- Group Actions -->
+                            <div class="group-actions">
+                                <button onclick="toggleEditForm(<?php echo $group['id']; ?>)">Edit</button>
+                                <form method="POST" action="groups.php" style="display: inline;">
+                                    <input type="hidden" name="action" value="delete">
+                                    <input type="hidden" name="group_id" value="<?php echo $group['id']; ?>">
+                                    <button type="submit" onclick="return confirm('Are you sure you want to delete this group?')">Delete</button>
+                                </form>
+                                <button onclick="toggleJoinRequests(<?php echo $group['id']; ?>)">View Join Requests</button>
+                            </div>
+
+                            <!-- Edit Form (Hidden by default) -->
+                            <div id="edit-form-<?php echo $group['id']; ?>" class="edit-form">
+                                <form method="POST" action="groups.php">
+                                    <input type="hidden" name="action" value="edit">
+                                    <input type="hidden" name="group_id" value="<?php echo $group['id']; ?>">
+                                    <label for="edit-name-<?php echo $group['id']; ?>">Group Name:</label>
+                                    <input type="text" name="name" id="edit-name-<?php echo $group['id']; ?>" 
+                                           value="<?php echo htmlspecialchars($group['name']); ?>" required>
+                                    <label for="edit-description-<?php echo $group['id']; ?>">Description:</label>
+                                    <textarea name="description" id="edit-description-<?php echo $group['id']; ?>" required><?php echo htmlspecialchars($group['description']); ?></textarea>
+                                    <button type="submit">Save Changes</button>
+                                    <button type="button" onclick="toggleEditForm(<?php echo $group['id']; ?>)">Cancel</button>
+                                </form>
+                            </div>
+
+                            <!-- Join Requests Section -->
+                            <div id="join-requests-<?php echo $group['id']; ?>" style="display: none;">
+                                <?php
+                                $requestsQuery = "
+                                    SELECT gr.id AS request_id, m.username
+                                    FROM group_requests gr
+                                    JOIN members m ON gr.member_id = m.id
+                                    WHERE gr.group_id = ? AND gr.status = 'pending'";
+                                $requestsStmt = $conn->prepare($requestsQuery);
+                                $requestsStmt->bind_param("i", $group['id']);
+                                $requestsStmt->execute();
+                                $requests = $requestsStmt->get_result();
+
+                                if ($requests->num_rows > 0):
+                                ?>
+                                <ul>
+                                    <?php while ($request = $requests->fetch_assoc()): ?>
+                                    <li>
+                                        <?php echo htmlspecialchars($request['username']); ?>
+                                        <form method="POST" action="groups.php" style="display:inline;">
+                                            <input type="hidden" name="action" value="approve">
+                                            <input type="hidden" name="request_id" value="<?php echo $request['request_id']; ?>">
+                                            <button type="submit">Accept</button>
+                                        </form>
+                                        <form method="POST" action="groups.php" style="display:inline;">
+                                            <input type="hidden" name="action" value="deny">
+                                            <input type="hidden" name="request_id" value="<?php echo $request['request_id']; ?>">
+                                            <button type="submit">Deny</button>
+                                        </form>
+                                    </li>
+                                    <?php endwhile; ?>
+                                </ul>
+                                <?php else: ?>
+                                <p>No pending join requests.</p>
+                                <?php endif; ?>
+                            </div>
                         </li>
-                        <?php endwhile; ?>
-                    </ul>
-                    <?php else: ?>
-                    <p>No pending join requests.</p>
-                    <?php endif; ?>
-                </details>
-            </li>
-            <?php endwhile; ?>
-        </ul>
-    </div>
-<?php else: ?>
-    <p>You have not created any groups yet.</p>
-<?php endif; ?>
+                    <?php endwhile; ?>
+                </ul>
+            <?php else: ?>
+                <p>You have not created any groups yet.</p>
+            <?php endif; ?>
+        </div>
 
         <!-- Section: Active Groups -->
         <div class="section">
@@ -282,5 +369,17 @@ $activeMembers = $activeMembersStmt->get_result();
             <?php endif; ?>
         </div>
     </div>
+
+    <script>
+        function toggleEditForm(groupId) {
+            const editForm = document.getElementById(`edit-form-${groupId}`);
+            editForm.classList.toggle('active');
+        }
+
+        function toggleJoinRequests(groupId) {
+            const joinRequests = document.getElementById(`join-requests-${groupId}`);
+            joinRequests.style.display = joinRequests.style.display === 'none' ? 'block' : 'none';
+        }
+    </script>
 </body>
 </html>

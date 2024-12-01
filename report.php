@@ -18,21 +18,27 @@ $filterColumn = isset($_POST['filter_column']) ? $_POST['filter_column'] : null;
 $filterValue = isset($_POST['filter_value']) ? $_POST['filter_value'] : null;
 
 $results = null;
+$error = null;
 
-if ($reportType && $filterColumn && $filterValue) {
-    if ($reportType === 'members') {
-        $query = "SELECT id, username, age, profession, region FROM members WHERE $filterColumn = ?";
-    } elseif ($reportType === 'groups') {
-        $query = "SELECT id, name, category, region FROM groups WHERE $filterColumn = ?";
-    } else {
-        $query = null;
-    }
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && $reportType && $filterColumn && $filterValue) {
+    $allowedColumns = [
+        'members' => ['interest', 'age', 'profession', 'region'],
+        'groups' => ['category', 'region']
+    ];
 
-    if ($query) {
+    if (in_array($filterColumn, $allowedColumns[$reportType])) {
+        if ($reportType === 'members') {
+            $query = "SELECT id, username, age, profession, region FROM members WHERE $filterColumn = ?";
+        } elseif ($reportType === 'groups') {
+            $query = "SELECT id, name, category, region FROM `groups` WHERE $filterColumn = ?";
+        }
+
         $stmt = $conn->prepare($query);
         $stmt->bind_param("s", $filterValue);
         $stmt->execute();
         $results = $stmt->get_result();
+    } else {
+        $error = "Invalid filter column selected.";
     }
 }
 ?>
@@ -42,6 +48,25 @@ if ($reportType && $filterColumn && $filterValue) {
     <meta charset="UTF-8">
     <title>Reports - COSN</title>
     <link rel="stylesheet" href="styles/styles.css">
+    <script>
+        function updateFilterOptions() {
+            const reportType = document.getElementById('report_type').value;
+            const filterColumn = document.getElementById('filter_column');
+            filterColumn.innerHTML = '';
+
+            const options = {
+                'members': ['interest', 'age', 'profession', 'region'],
+                'groups': ['category', 'region']
+            };
+
+            options[reportType].forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option.charAt(0).toUpperCase() + option.slice(1);
+                filterColumn.appendChild(optionElement);
+            });
+        }
+    </script>
 </head>
 <body>
     <button class="back-button" onclick="window.location.href='<?php echo $backUrl; ?>';">&larr; Back</button>
@@ -49,23 +74,13 @@ if ($reportType && $filterColumn && $filterValue) {
 
     <form method="POST" action="report.php" class="report-form">
         <label for="report_type">Report Type:</label>
-        <select name="report_type" id="report_type" required>
+        <select name="report_type" id="report_type" required onchange="updateFilterOptions()">
             <option value="members" <?php echo $reportType === 'members' ? 'selected' : ''; ?>>Members</option>
             <option value="groups" <?php echo $reportType === 'groups' ? 'selected' : ''; ?>>Groups</option>
         </select>
 
         <label for="filter_column">Filter By:</label>
-        <select name="filter_column" id="filter_column" required>
-            <?php if ($reportType === 'members'): ?>
-                <option value="interest" <?php echo $filterColumn === 'interest' ? 'selected' : ''; ?>>Interest</option>
-                <option value="age" <?php echo $filterColumn === 'age' ? 'selected' : ''; ?>>Age</option>
-                <option value="profession" <?php echo $filterColumn === 'profession' ? 'selected' : ''; ?>>Profession</option>
-                <option value="region" <?php echo $filterColumn === 'region' ? 'selected' : ''; ?>>Region</option>
-            <?php elseif ($reportType === 'groups'): ?>
-                <option value="category" <?php echo $filterColumn === 'category' ? 'selected' : ''; ?>>Category</option>
-                <option value="region" <?php echo $filterColumn === 'region' ? 'selected' : ''; ?>>Region</option>
-            <?php endif; ?>
-        </select>
+        <select name="filter_column" id="filter_column" required></select>
 
         <label for="filter_value">Filter Value:</label>
         <input type="text" name="filter_value" id="filter_value" value="<?php echo htmlspecialchars($filterValue ?? ''); ?>" required>
@@ -73,7 +88,9 @@ if ($reportType && $filterColumn && $filterValue) {
         <button type="submit">Generate Report</button>
     </form>
 
-    <?php if ($results): ?>
+    <?php if ($error): ?>
+        <p class="error"><?php echo htmlspecialchars($error); ?></p>
+    <?php elseif ($results): ?>
         <h2>Report Results</h2>
         <table>
             <thead>
@@ -105,5 +122,10 @@ if ($reportType && $filterColumn && $filterValue) {
     <?php elseif ($_SERVER['REQUEST_METHOD'] === 'POST'): ?>
         <p>No results found for the given filter.</p>
     <?php endif; ?>
+
+    <script>
+        // Initialize filter options on page load
+        updateFilterOptions();
+    </script>
 </body>
 </html>

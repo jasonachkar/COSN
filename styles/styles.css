@@ -516,3 +516,55 @@ form {
 
 
 
+.post-container {
+    width: 100%;
+    max-width: 800px;
+    margin: auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.post-item {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+.post-content {
+    margin-bottom: 15px;
+}
+
+.post-image {
+    width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 8px;
+}
+
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.like-button {
+    font-size: 20px;
+    color: #888;
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    transition: color 0.3s;
+}
+
+.like-button:hover {
+    color: #555;
+}
+
+.like-button.liked {
+    color: red;
+}

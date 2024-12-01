@@ -1,70 +1,113 @@
 <?php
 session_start();
-include 'database.php'; // Database connection
+include 'database.php';
 
-// Check if user is logged in
-if (!isset($_SESSION['user_id'])) {
+// Ensure user is logged in
+if (!isset($_SESSION['username']) || !isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 
+$username = $_SESSION['username'];
 $userId = $_SESSION['user_id'];
-$backUrl = isset($_SESSION['username']) ? 'home.php' : 'index.php';
+$backUrl = 'home.php';
 
-// Handle event creation form submission
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['create_event'])) {
-    $title = $_POST['title'];
-    $description = $_POST['description'];
-    $location = $_POST['location'];
-    $event_date = $_POST['event_date'];
-    $event_time = $_POST['event_time'];
-
-    $stmt = $conn->prepare("INSERT INTO events (group_id, creator_id, title, description, location, event_date, event_time) VALUES (?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("iisssss", $_POST['group_id'], $userId, $title, $description, $location, $event_date, $event_time);
+// Function to get user's groups
+function getUserGroups($conn, $userId) {
+    $query = "SELECT g.id, g.name FROM `groups` g
+              JOIN group_members gm ON g.id = gm.group_id
+              WHERE gm.member_id = ?";
+    $stmt = $conn->prepare($query);
+    $stmt->bind_param("i", $userId);
     $stmt->execute();
-    $stmt->close();
+    return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
 }
 
-// Handle voting
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['vote'])) {
-    $eventId = $_POST['event_id'];
-    $voteDate = $_POST['vote_date'];
-    $voteTime = $_POST['vote_time'];
-    $votePlace = $_POST['vote_place'];
+// Handle event creation
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create_event') {
+    $title = $_POST['title'];
+    $description = $_POST['description'];
+    $groupId = $_POST['group_id'];
+    $dates = $_POST['dates'];
+    $times = $_POST['times'];
+    $locations = $_POST['locations'];
 
-    $voteQuery = "INSERT INTO event_votes (event_id, member_id, vote_date, vote_time, vote_place) VALUES (?, ?, ?, ?, ?)";
-    $voteStmt = $conn->prepare($voteQuery);
-    $voteStmt->bind_param("iisss", $eventId, $userId, $voteDate, $voteTime, $votePlace);
+    $createEventQuery = "INSERT INTO events (title, description, group_id, creator_id) VALUES (?, ?, ?, ?)";
+    $createEventStmt = $conn->prepare($createEventQuery);
+    $createEventStmt->bind_param("ssii", $title, $description, $groupId, $userId);
 
-    if ($voteStmt->execute()) {
-        echo "Vote submitted successfully!";
+    if ($createEventStmt->execute()) {
+        $eventId = $createEventStmt->insert_id;
+
+        // Insert event options
+        $insertOptionQuery = "INSERT INTO event_options (event_id, date, time, location) VALUES (?, ?, ?, ?)";
+        $insertOptionStmt = $conn->prepare($insertOptionQuery);
+
+        for ($i = 0; $i < count($dates); $i++) {
+            $insertOptionStmt->bind_param("isss", $eventId, $dates[$i], $times[$i], $locations[$i]);
+            $insertOptionStmt->execute();
+        }
+
+        header("Location: events.php?success=Event created successfully.");
+        exit();
     } else {
-        echo "Error: " . $voteStmt->error;
+        $error = "Error creating event: " . $createEventStmt->error;
     }
 }
 
-// Fetch upcoming events
-$events = $conn->query("SELECT e.*, m.username as creator FROM events e JOIN members m ON e.creator_id = m.id WHERE e.event_date >= CURDATE() ORDER BY e.event_date ASC");
 
-// Fetch voting results
-function getVotingResults($conn, $eventId) {
-    $votesQuery = "
-        SELECT vote_date, vote_time, vote_place, COUNT(*) AS vote_count
-        FROM event_votes
-        WHERE event_id = ?
-        GROUP BY vote_date, vote_time, vote_place
-        ORDER BY vote_count DESC";
-    $stmt = $conn->prepare($votesQuery);
-    $stmt->bind_param("i", $eventId);
-    $stmt->execute();
-    return $stmt->get_result();
+//Handle Voting
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'vote') {
+    $optionId = $_POST['option_id'];
+    $eventId = $_POST['event_id'];
+
+    // Check if user has already voted
+    $checkVoteQuery = "SELECT id FROM event_votes WHERE event_id = ? AND user_id = ?";
+    $checkVoteStmt = $conn->prepare($checkVoteQuery);
+    $checkVoteStmt->bind_param("ii", $eventId, $userId);
+    $checkVoteStmt->execute();
+    $existingVote = $checkVoteStmt->get_result()->fetch_assoc();
+
+    if ($existingVote) {
+        // Update existing vote
+        $updateVoteQuery = "UPDATE event_votes SET option_id = ? WHERE id = ?";
+        $updateVoteStmt = $conn->prepare($updateVoteQuery);
+        $updateVoteStmt->bind_param("ii", $optionId, $existingVote['id']);
+        $updateVoteStmt->execute();
+    } else {
+        // Insert new vote
+        $insertVoteQuery = "INSERT INTO event_votes (event_id, user_id, option_id) VALUES (?, ?, ?)";
+        $insertVoteStmt = $conn->prepare($insertVoteQuery);
+        $insertVoteStmt->bind_param("iii", $eventId, $userId, $optionId);
+        $insertVoteStmt->execute();
+    }
+
+    header("Location: events.php?success=Vote recorded successfully.");
+    exit();
 }
+
+// Fetch upcoming events for the user's groups
+$upcomingEventsQuery = "SELECT e.id, e.title, e.description, e.creator_id, g.name AS group_name, m.username AS creator_name
+                        FROM events e
+                        JOIN `groups` g ON e.group_id = g.id
+                        JOIN members m ON e.creator_id = m.id
+                        JOIN group_members gm ON g.id = gm.group_id
+                        WHERE gm.member_id = ?
+                        ORDER BY e.creator_id ASC";
+$upcomingEventsStmt = $conn->prepare($upcomingEventsQuery);
+$upcomingEventsStmt->bind_param("i", $userId);
+$upcomingEventsStmt->execute();
+$upcomingEvents = $upcomingEventsStmt->get_result();
+
+// Get user's groups for the dropdown
+$userGroups = getUserGroups($conn, $userId);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Events - COSN</title>
     <link rel="stylesheet" href="styles/styles.css">
 </head>
@@ -75,79 +118,101 @@ function getVotingResults($conn, $eventId) {
     </div>
 
     <div class="container">
-        <!-- Event Creation Form -->
-        <div class="event-form">
+        <!-- Create Event Section -->
+        <div class="section">
             <h2>Create an Event</h2>
-            <form method="POST" action="events.php">
-                <input type="hidden" name="group_id" value="1"> <!-- Assuming group ID is 1 for now -->
-
+            <form action="events.php" method="POST">
+                <input type="hidden" name="action" value="create_event">
                 <label for="title">Event Title:</label>
-                <input type="text" name="title" id="title" required>
+                <input type="text" id="title" name="title" required>
 
                 <label for="description">Description:</label>
-                <textarea name="description" id="description"></textarea>
+                <textarea id="description" name="description" required></textarea>
 
-                <label for="location">Location:</label>
-                <input type="text" name="location" id="location" required>
+                <label for="group_id">Select Group:</label>
+                <select id="group_id" name="group_id" required>
+                    <?php foreach ($userGroups as $group): ?>
+                        <option value="<?php echo $group['id']; ?>"><?php echo htmlspecialchars($group['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
 
-                <div class="datetime-fields">
-                    <label for="event_date">Date:</label>
-                    <input type="date" name="event_date" id="event_date" required>
-
-                    <label for="event_time">Time:</label>
-                    <input type="time" name="event_time" id="event_time" required>
+                <div id="event-options">
+                    <div class="event-option">
+                        <label for="dates[]">Date:</label>
+                        <input type="date" name="dates[]" required>
+                        <label for="times[]">Time:</label>
+                        <input type="time" name="times[]" required>
+                        <label for="locations[]">Location:</label>
+                        <input type="text" name="locations[]" required>
+                    </div>
                 </div>
-
-                <button type="submit" name="create_event" class="create-event-button">Create Event</button>
+                <button type="button" onclick="addEventOption()">Add Another Option</button>
+                <button type="submit">Create Event</button>
             </form>
         </div>
 
-        <!-- Upcoming Events on the Right Side -->
-        <div class="events-list">
+        <!-- Upcoming Events Section -->
+        <div class="section">
             <h2>Upcoming Events</h2>
-            <?php if ($events->num_rows > 0): ?>
+            <?php if ($upcomingEvents->num_rows > 0): ?>
                 <ul>
-                    <?php while ($event = $events->fetch_assoc()): ?>
+                    <?php while ($event = $upcomingEvents->fetch_assoc()): ?>
                         <li>
                             <h3><?php echo htmlspecialchars($event['title']); ?></h3>
-                            <p><strong>Creator:</strong> <?php echo htmlspecialchars($event['creator']); ?></p>
+                            <p>Group: <?php echo htmlspecialchars($event['group_name']); ?></p>
+                            <p>Created by: <?php echo htmlspecialchars($event['creator_name']); ?></p>
                             <p><?php echo htmlspecialchars($event['description']); ?></p>
-                            <p><strong>Location:</strong> <?php echo htmlspecialchars($event['location']); ?></p>
-                            <p><strong>Date:</strong> <?php echo htmlspecialchars($event['event_date']); ?></p>
-                            <p><strong>Time:</strong> <?php echo htmlspecialchars($event['event_time']); ?></p>
-
-                            <!-- Voting Form -->
-                            <form method="POST" action="events.php">
-                                <input type="hidden" name="vote" value="1">
+                            <h4>Options:</h4>
+                            <form action="events.php" method="POST">
+                                <input type="hidden" name="action" value="vote">
                                 <input type="hidden" name="event_id" value="<?php echo $event['id']; ?>">
-                                <label for="vote_date">Date:</label>
-                                <input type="date" name="vote_date" required>
-                                <label for="vote_time">Time:</label>
-                                <input type="time" name="vote_time" required>
-                                <label for="vote_place">Place:</label>
-                                <input type="text" name="vote_place" required>
-                                <button type="submit">Submit Vote</button>
-                            </form>
-
-                            <!-- Voting Results -->
-                            <h4>Voting Results:</h4>
-                            <ul>
                                 <?php
-                                $results = getVotingResults($conn, $event['id']);
-                                while ($result = $results->fetch_assoc()):
+                                $optionsQuery = "SELECT eo.id, eo.date, eo.time, eo.location, COUNT(ev.id) as votes
+                                                 FROM event_options eo
+                                                 LEFT JOIN event_votes ev ON eo.id = ev.option_id
+                                                 WHERE eo.event_id = ?
+                                                 GROUP BY eo.id";
+                                $optionsStmt = $conn->prepare($optionsQuery);
+                                $optionsStmt->bind_param("i", $event['id']);
+                                $optionsStmt->execute();
+                                $options = $optionsStmt->get_result();
+                                while ($option = $options->fetch_assoc()):
                                 ?>
-                                    <li>
-                                        <?php echo htmlspecialchars($result['vote_date']) . ' at ' . htmlspecialchars($result['vote_time']) . ' - ' . htmlspecialchars($result['vote_place']) . ' (' . $result['vote_count'] . ' votes)'; ?>
-                                    </li>
+                                    <div>
+                                        <input type="radio" id="option-<?php echo $option['id']; ?>" name="option_id" value="<?php echo $option['id']; ?>" required>
+                                        <label for="option-<?php echo $option['id']; ?>">
+                                            <?php echo htmlspecialchars($option['date']); ?> at 
+                                            <?php echo htmlspecialchars($option['time']); ?>, 
+                                            <?php echo htmlspecialchars($option['location']); ?>
+                                            (Votes: <?php echo $option['votes']; ?>)
+                                        </label>
+                                    </div>
                                 <?php endwhile; ?>
-                            </ul>
+                                <button type="submit">Vote</button>
+                            </form>
                         </li>
                     <?php endwhile; ?>
                 </ul>
             <?php else: ?>
-                <p>No upcoming events. Create one to get started!</p>
+                <p>No upcoming events.</p>
             <?php endif; ?>
         </div>
     </div>
+    <script>
+        function addEventOption() {
+            const container = document.getElementById('event-options');
+            const newOption = document.createElement('div');
+            newOption.className = 'event-option';
+            newOption.innerHTML = `
+                <label for="dates[]">Date:</label>
+                <input type="date" name="dates[]" required>
+                <label for="times[]">Time:</label>
+                <input type="time" name="times[]" required>
+                <label for="locations[]">Location:</label>
+                <input type="text" name="locations[]" required>
+            `;
+            container.appendChild(newOption);
+        }
+    </script>
 </body>
 </html>

@@ -21,6 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             // Set session variables
             $_SESSION['username'] = $user['username'];
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['role'] = $user['role']; // 'admin' or 'member'
 
             // Redirect to the home page or friends page
             header("Location: home.php");

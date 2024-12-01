@@ -72,10 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message']) && isset($_
     <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
-    <button class="back-button" onclick="window.location.href='<?php echo $backUrl; ?>';">
-        &larr; Back
-    </button>
-    <div class="messages-container">
+<div class="header">
+        <a href="home.php" class="back-button">← Back</a>
+        </div>
+    <div class="welcome-container">
         <h1>Messages</h1>
 
         <!-- Message Suggestions -->

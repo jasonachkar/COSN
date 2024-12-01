@@ -2,12 +2,6 @@
 session_start();
 include 'database.php'; // Include database connection
 
-// Ensure admin or authorized user is logged in
-if (!isset($_SESSION['admin']) || $_SESSION['admin'] !== true) {
-    header("Location: login.html");
-    exit();
-}
-
 // Handle Create Member
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'create') {
     $username = $_POST['username'];
