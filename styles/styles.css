@@ -454,7 +454,7 @@ form {
     color: #fff;
 }
 
-/* ----------------------------------------- LOGIN PAGE BELOW ----------------------------------------- */
+/* ----------------------------------------- LOGIN AND REGISTER PAGES BELOW ----------------------------------------- */
 
 .form-container {
     max-width: 400px; 
@@ -512,59 +512,431 @@ form {
     text-decoration: underline;
 }
 
-
-
-
-
-.post-container {
-    width: 100%;
-    max-width: 800px;
-    margin: auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+/* ----------------------------------------- HOME PAGE BELOW ----------------------------------------- */
+html.home .action-button{
+    margin-top: 5px;
 }
 
-.post-item {
-    margin-bottom: 20px;
-    padding: 15px;
-    border: 1px solid #ddd;
+html.home .section {
+    background-color: #f8f9fa;
     border-radius: 8px;
-    background-color: #fff;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 30px;
+    max-width: 100%; 
+    height: auto; 
+    overflow: visible; 
+    margin-top: 15px;
 }
 
-.post-content {
+html.home .section h2 {
+    font-size: 24px;
+    color: #28a745;
     margin-bottom: 15px;
 }
 
-.post-image {
-    width: 100%;
-    height: auto;
-    margin-top: 10px;
-    border-radius: 8px;
+html.home .section label {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+    display: block;
 }
 
-.post-actions {
+html.home .section input[type="text"],
+html.home .section select,
+html.home .section textarea {
+    width: 100%;
+    padding: 12px; 
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+    font-size: 14px;
+    background-color: #fff;
+    transition: border 0.3s ease-in-out;
+}
+
+html.home .section input[type="text"]:focus,
+html.home .section select:focus,
+html.home .section textarea:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+html.home .section button {
+    background-color: #28a745;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease-in-out;
+}
+
+html.home .section button:hover {
+    background-color: #218838;
+}
+
+html.home .section input[type="file"] {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    margin-bottom: 15px;
+}
+
+html.home .section .form-group {
+    margin-bottom: 20px;
+}
+
+html.home .section .form-group input,
+html.home .section .form-group select {
+    width: 100%;
+}
+
+html.home .section .form-group label {
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/*------------------------------------------------------*/
+html.home .welcome-message{
+    color: #232523;
+}
+
+html.home .welcome-container {
+    background-color: #f8f9fa;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 5px;
+    text-align: center; 
+    max-width: 600px;
+    width: 100%; 
+    margin-left: auto; 
+    margin-right: auto; 
+}
+
+html.home .button-container {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column; 
     align-items: center;
 }
 
-.like-button {
-    font-size: 20px;
-    color: #888;
-    background: none;
+html.home .back-button,
+html.home .logout-button {
+    display: block !important;
+    margin-bottom: 10px; 
+    text-align: center;   
+    text-decoration: none; 
+    border-radius: 5px;  
+    background-color: white;
+    color: #28a745;
+}
+
+html.home .logout-button{
+    font-weight: lighter;
+}
+
+html.home .back-button:hover,
+html.home .logout-button:hover {
+    background-color: #218838; 
+    color: white;
+}
+
+/*--------------------------------- FRIENDS STYLING BELOW -------------------------------*/
+html.friends {
+    text-align: center !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+    gap: 30px !important; 
+}
+
+html.friends .add-friend {
+    background-color: #f9f9f9 !important;
+    padding: 20px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+    margin-bottom: 20px !important;
+    width: 80%;
+    margin: 0 auto 20px auto;
+}
+
+html.friends .add-friend h2 {
+    color: #28a745;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+html.friends .add-friend form {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    justify-content: center;
+    align-items: center;
+}
+
+html.friends .add-friend input[type="text"] {
+    width: 50% !important;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+html.friends .add-friend button {
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
-    outline: none;
-    transition: color 0.3s;
+    transition: background-color 0.3s;
+    margin-top: 0.55%;
 }
 
-.like-button:hover {
-    color: #555;
+html.friends .add-friend button:hover {
+    background-color: #218838;
 }
 
-.like-button.liked {
-    color: red;
+html.friends .friend-list,
+html.friends .pending-requests,
+html.friends .sent-requests,
+html.friends .blocked-members {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+    width: 80%;
+    margin: 0 auto 20px auto;
 }
+
+html.friends .friend-list h2,
+html.friends .pending-requests h2,
+html.friends .sent-requests h2,
+html.friends .blocked-members h2 {
+    color: #28a745;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+html.friends ul {
+    list-style: none !important;
+    padding: 0;
+}
+
+html.friends li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    gap: 5px;
+    width: 15%;
+    margin: 0 auto 5px auto;
+}
+
+html.friends li form,
+html.friends li a {
+    margin-left: 1px;
+}
+
+html.friends li:last-child {
+    border-bottom: none;
+}
+
+html.friends li form,
+html.friends li a {
+    margin-left: 2px;
+}
+
+html.friends li button {
+    background-color: #dc3545 !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 5px !important;
+    padding: 5px 10px !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s ease !important;
+}
+
+html.friends li button:hover {
+    background-color: #c82333;
+}
+
+html.friends li a {
+    color: #007bff;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.friends li a:hover {
+    background-color: #0056b3;
+    color: white;
+}
+
+html.friends p {
+    color: #666;
+    font-size: 1em;
+    margin-top: 10px;
+} 
+
+html.friends .sent-requests li {
+    color: #888;
+    font-style: italic;
+} 
+
+html.friends .back-button {
+    position: absolute !important;
+    top: 20px !important;
+    left: 20px !important;
+    background-color: #28a745 !important;
+    color: #ffffff !important;
+    padding: 10px 20px !important;
+    border: none !important;
+    border-radius: 5px !important;
+    text-decoration: none !important;
+    cursor: pointer !important;
+    transition: background-color 0.3s ease, color 0.3s ease !important;
+}
+
+html.friends .back-button:hover {
+    background-color: #218838;
+    color: white;
+}
+
+html.friends .back-button:hover {
+    background-color: #28a745;
+    color: white;
+}
+
+/*---------------------------------- MESSAGES PAGE BELOW ------------------------------*/
+html.messages {
+    text-align: center !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    padding: 20px !important;
+    gap: 30px !important;
+}
+
+html.messages .header {
+    width: 100%;
+    background-color: #28a745;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+}
+
+html.messages .back-button:hover {
+    background-color: #28a745;
+    color: #ffffff;
+}
+
+html.messages .message-suggestions,
+html.messages .existing-conversations {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin-top: 80px;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+html.messages .message-suggestions h3,
+html.messages .existing-conversations h3 {
+    color: #28a745;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+html.messages ul {
+    list-style: none !important;
+    padding: 0;
+}
+
+html.messages li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    gap: 5px; 
+    width: 50%;
+    margin: 0 auto;
+}
+
+html.messages li:last-child {
+    border-bottom: none;
+}
+
+html.messages .suggested-username {
+    margin-top: 0.55%;
+    background-color: #f9f9f9;
+    padding: 5px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    margin: 5px 0;
+    display: inline-block;
+}
+
+
+html.messages li form {
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+    align-items: center;
+    margin-left: auto;
+}
+
+html.messages li input[type="text"] {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.9em;
+    width: auto;
+}
+
+html.messages li button {
+    padding: 5px 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+html.messages li button:hover {
+    background-color: #218838;
+}
+
+html.messages li a {
+    color: #007bff;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.messages li a:hover {
+    background-color: #0056b3;
+    color: white;
+}
+
+html.messages p {
+    color: #666;
+    font-size: 1em;
+    margin-top: 10px;
+}
+
+

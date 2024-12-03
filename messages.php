@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message']) && isset($_
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="messages">
 <head>
     <meta charset="UTF-8">
     <title>Messages - COSN</title>
@@ -85,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['message']) && isset($_
                 <ul>
                     <?php while ($suggestion = $suggestions->fetch_assoc()): ?>
                         <li>
-                            <?php echo htmlspecialchars($suggestion['username']); ?>
+                            <span class="suggested-username"><?php echo htmlspecialchars($suggestion['username']); ?></span>
                             <form method="POST" action="messages.php" style="display:inline;">
                                 <input type="hidden" name="friend_id" value="<?php echo $suggestion['id']; ?>">
                                 <input type="text" name="message" placeholder="Say Hi!" required>

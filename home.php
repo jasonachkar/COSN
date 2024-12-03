@@ -142,7 +142,7 @@ $groupPosts = $groupPostsStmt->get_result();
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="home">
 <head>
     <meta charset="UTF-8">
     <title>Home - COSN</title>
@@ -168,10 +168,12 @@ $groupPosts = $groupPostsStmt->get_result();
 </head>
 <body>
     <div class="header">
-        <a href="previous-page.php" class="back-button">← Back</a>
+        <div clas="button-container">
+            <a href="previous-page.php" class="back-button">← Back</a>
+            <a href="logout.php" class="logout-button">Logout</a>
+        </div>
         <div class="welcome-container">
             <span class="welcome-message">COSN - Welcome, <?php echo htmlspecialchars($username); ?>!</span>
-            <a href="logout.php" class="logout-button">Logout</a>
         </div>
     </div>
 
@@ -280,15 +282,12 @@ $groupPosts = $groupPostsStmt->get_result();
         <div class="sidebar actions">
             <h3>Actions</h3>
             <a href="messages.php" class="action-button">Messages</a>
-            <br/>
             <a href="groups.php" class="action-button">Groups</a>
-            <br/>
             <a href="events.php" class="action-button">Events</a>
-            <br/>
-            <a href="friends.php" class="action-button">Friends</a><br/>
-            <a href="gift_exchange.php" class="action-button">Gift Exchange</a><br/>
+            <a href="friends.php" class="action-button">Friends</a>
+            <a href="gift_exchange.php" class="action-button">Gift Exchange</a>
             <a href="admin.php" class="action-button">Account Settings</a><br/>
-            <h3>Notifications</h3><br/>
+            <h3>Notifications</h3>
             <p>No new notifications.</p><br/>
         </div>
     </div>
