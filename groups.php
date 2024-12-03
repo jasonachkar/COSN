@@ -192,7 +192,7 @@ $adminGroups = $adminGroupsStmt->get_result();
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="groups">
 <head>
     <meta charset="UTF-8">
     <title>Groups Management - COSN</title>
@@ -247,7 +247,7 @@ $adminGroups = $adminGroupsStmt->get_result();
                                 <form method="POST" action="groups.php" style="display: inline;">
                                     <input type="hidden" name="action" value="delete">
                                     <input type="hidden" name="group_id" value="<?php echo $group['id']; ?>">
-                                    <button type="submit" onclick="return confirm('Are you sure you want to delete this group?')">Delete</button>
+                                    <button class="delete-button" type="submit" onclick="return confirm('Are you sure you want to delete this group?')">Delete</button>
                                 </form>
                                 <button onclick="toggleJoinRequests(<?php echo $group['id']; ?>)">View Join Requests</button>
                             </div>

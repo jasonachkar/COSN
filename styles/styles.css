@@ -939,4 +939,453 @@ html.messages p {
     margin-top: 10px;
 }
 
+/*---------------------------- GROUPS PAGE BELOW --------------------------------*/
+/* Groups Page Styling */
+html.groups {
+    text-align: center;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 30px;
+}
+
+html.groups .header {
+    width: 100%;
+    background-color: #28a745;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+html.groups .header h1 {
+    flex-grow: 1;
+    text-align: center;
+    margin-right: 50px; /* To balance the space with the back button */
+}
+
+html.groups .back-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ffffff;
+    color: #28a745;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+html.groups .back-button {
+    background-color: #ffffff;
+    color: #28a745;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+html.groups .back-button:hover {
+    background-color: #cccccc;
+}
+
+html.groups .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    overflow-x: auto;
+    margin-top: 80px;
+}
+
+html.groups .section {
+    flex: 1 1 calc(50% - 20px);
+    min-width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    overflow-y: auto;
+    max-height: 400px;
+    margin-bottom: 20px;
+}
+
+html.groups .section form label {
+    display: block;
+    text-align: left;
+    width: 70%;
+    margin-bottom: 1px;
+    align-self: center;
+}
+
+html.groups .section form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+html.groups .section form input[type="text"],
+html.groups .section form textarea {
+    width: 70%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+html.groups .section form button {
+    margin-top: 10px;
+    align-self: center;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+html.groups .section h2 {
+    color: #28a745;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+html.groups ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+html.groups li {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    gap: 10px;
+}
+
+html.groups li:last-child {
+    border-bottom: none;
+}
+
+html.groups li strong {
+    font-size: 1.1em;
+    color: #333;
+}
+
+html.groups li p {
+    color: #666;
+    font-size: 0.9em;
+}
+
+html.groups .group-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-start; /* Align buttons together vertically */
+    height: auto;
+}
+
+html.groups .group-actions button {
+    padding: 4px 10px; /* Make buttons less tall */
+    height: 30px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-weight: normal;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+html.groups .group-actions button:hover {
+    background-color: #218838;
+}
+
+html.groups .edit-form {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #f9f9f9;
+}
+
+html.groups .edit-form.active {
+    display: block;
+}
+
+html.groups .edit-form label {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+html.groups .edit-form input[type="text"],
+html.groups .edit-form textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+html.groups .edit-form button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+html.groups .edit-form button:hover {
+    background-color: #218838;
+}
+
+html.groups .join-requests {
+    display: none;
+    margin-top: 10px;
+}
+
+html.groups .join-requests ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+html.groups .join-requests li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+html.groups .join-requests li:last-child {
+    border-bottom: none;
+}
+
+html.groups .join-requests button {
+    padding: 5px 10px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+html.groups .join-requests button:hover {
+    background-color: #218838;
+}
+
+html.groups p {
+    color: #666;
+    font-size: 1em;
+    margin-top: 10px;
+}
+
+html.groups .delete-button{
+    margin-bottom: 10.2px;
+}
+
+/*--------------------------------------------- EVENTS PAGE ------------------------------------------*/
+/* Events Page Styling */
+html.events {
+    text-align: center;
+    max-width: 100%;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 30px;
+}
+
+html.events .header {
+    width: 100%;
+    background-color: #28a745;
+    color: white;
+    position: fixed;
+    top: 0;
+    left: 0;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+html.events .header h1 {
+    flex-grow: 1;
+    text-align: center;
+    margin-right: 50px;
+}
+
+html.events .back-button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background-color: #ffffff;
+    color: #28a745;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    text-decoration: none;
+    transition: background-color 0.3s;
+}
+
+html.events .back-button:hover {
+    background-color: #cccccc;
+}
+
+html.events .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    overflow-x: auto;
+    margin-top: 80px;
+}
+
+html.events .section {
+    flex: 1 1 calc(50% - 20px);
+    min-width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    background-color: #fff;
+    overflow-y: auto;
+    max-height: 400px;
+    margin-bottom: 20px;
+}
+
+html.events .section form label {
+    display: block;
+    text-align: left;
+    width: 100%;
+    margin-bottom: 2px;
+    padding-left: 10px;
+    align-self: center;
+}
+
+html.events .section form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 70%;
+    margin: 0 auto;
+}
+
+html.events .section form input[type="text"],
+html.events .section form textarea,
+html.events .section form select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 2px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+html.events .section form button {
+    margin-top: 5px;
+    align-self: center;
+    padding: 8px 15px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+html.events .section h2 {
+    color: #28a745;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+html.events ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+html.events li {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    gap: 5px;
+}
+
+html.events li:last-child {
+    border-bottom: none;
+}
+
+html.events li strong {
+    font-size: 1.1em;
+    color: #333;
+}
+
+html.events li p {
+    color: #666;
+    font-size: 0.9em;
+}
+
+html.events .event-option {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 5px;
+    align-items: flex-start;
+}
+
+html.events .event-option input[type="date"],
+html.events .event-option input[type="time"],
+html.events .event-option input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 0.9em;
+}
+
+html.events .event-option label {
+    text-align: left;
+    margin-bottom: 5px;
+}
+
+html.events .event-option button {
+    padding: 8px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+html.events .event-option button:hover {
+    background-color: #0056b3;
+}
 
