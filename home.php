@@ -265,17 +265,20 @@ $groupPosts = $groupPostsStmt->get_result();
         <div class="groups-section">
             <h3>Your Groups</h3>
             <?php 
-            $groups->data_seek(0); // Reset the groups result pointer
-            while ($group = $groups->fetch_assoc()) : 
-            ?>
-                <p>
-                    <strong><?php echo htmlspecialchars($group['name']); ?></strong>: <?php echo htmlspecialchars($group['description']); ?>
-                    <form method="post" action="withdraw-group.php">
-                        <input type="hidden" name="group_id" value="<?php echo $group['id']; ?>">
-                        <button type="submit">Withdraw</button>
-                    </form>
-                </p>
+                $groups->data_seek(0); // Reset the groups result pointer
+                while ($group = $groups->fetch_assoc()) : 
+                ?>
+                    <div class="group-item">
+                        <p>
+                            <strong><?php echo htmlspecialchars($group['name']); ?></strong>: <?php echo htmlspecialchars($group['description']); ?>
+                            <form method="post" action="withdraw-group.php">
+                                <input type="hidden" name="group_id" value="<?php echo $group['id']; ?>">
+                                <button type="submit">Withdraw</button>
+                            </form>
+                        </p>
+                    </div>
             <?php endwhile; ?>
+  
         </div>
 
         <!-- Actions Section -->
