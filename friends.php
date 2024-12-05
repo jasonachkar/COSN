@@ -123,7 +123,7 @@ $blockedMembers = $blockedStmt->get_result();
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="friends">
 <head>
     <meta charset="UTF-8">
     <title>Friends - COSN</title>
