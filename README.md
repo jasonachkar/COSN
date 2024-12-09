@@ -2,6 +2,34 @@
 
 # COSN - Social Network Platform
 
+## Group Information
+
+Group 2
+
+- Max Legault:
+ID : 40173403
+ENCS: ma_egaul@encs.concordia.ca
+- Khaled Rezgui:
+ID: 40176606 
+ENCS: k_rezgui@encs.concordia.ca
+- Jason Achkar Diab:
+ID: 40227239 
+ENCS: ja_achka@encs.concordia.ca
+- Nadezhda Gagnon:
+ID: 40277786
+ENCS: g_nadezh@encs.concordia.ca
+
+Group Account:
+- gpc353_2@encs.concordia.ca
+
+Project URL:
+https://can01.safelinks.protection.outlook.com/?
+ url=https%3A%2F%2Fgpc353.encs.concordia.ca%2F&data=05%7C02%7Cjason.achkardiab%40mail.co
+ ncordia.ca%7C15bdb6c8a7874a93323f08dcde5c11dd%7C5569f185d22f4e139850ce5b1abcd2e8%7C0%
+ 7C0%7C638629734231325908%7CUnknown%7CTWFpbGZsb3d8eyJWIjoiMC4wLjAwMDAiLCJQIjoi
+ V2luMzIiLCJBTiI6Ik1haWwiLCJXVCI6Mn0%3D%7C0%7C%7C%7C&sdata=T7qES2dUSFmI1fLNW
+ 05ZFp65%2FoDH9I0XzTD80NDTskM%3D&reserved=0
+
 ## Project Overview
 
 COSN (Community Online Social Network) is a web-based social networking platform designed to allow users to connect, communicate, and share events with each other. The platform includes features such as user registration and login, friend requests, friend suggestions, event creation, group messaging, and notifications, providing a familiar, Facebook-like experience.
